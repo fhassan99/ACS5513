@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flask Web App</title>
+  </head>
+  <body>
+    <div
+      style="
+        background-color: #87cefa;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        padding: 0.5em 0;
+      "
+    >
+      <img
+        src="{{ url_for('static', filename='PBPirates.png') }}"
+        alt="Petabyte Pirates Icon"
+        style="height: 180px; margin-left: 16px; margin-right: 16px"
+      />
+      <span style="font-size: 2em; font-weight: bold; color: #222"
+        >Welcome to Petabyte Pirates!</span
+      >
+    </div>
+    <p>
+      On this page you can explore what a home should sell for by inputting
+      various parameters and pressing the calculate button.
+    </p>
+    <form method="post" action="/calculate">
+      <label for="overall_qual">Overall Quality (1-10):</label>
+      <input
+        type="number"
+        id="overall_qual"
+        name="overall_qual"
+        min="1"
+        max="10"
+        required
+        title="Overall material and finish quality of the house (1=Very Poor, 10=Excellent)"
+      /><br /><br />
+
+      <label for="gr_liv_area">Above ground Living Space (Sq Ft):</label>
+      <input
+        type="number"
+        id="gr_liv_area"
+        name="gr_liv_area"
+        min="0"
+        required
+        title="Above ground living area square feet (does not include basement)"
+      /><br /><br />
+
+      <label for="first_flr_sf"
+        >Ground (first) Floor Living Area (Sq Ft):</label
+      >
+      <input
+        type="number"
+        id="first_flr_sf"
+        name="first_flr_sf"
+        min="0"
+        required
+        title="Square feet of the ground (first) floor living area"
+      /><br /><br />
+
+      <label for="total_bsmt_sf">Total Basement Square Feet:</label>
+      <input
+        type="number"
+        id="total_bsmt_sf"
+        name="total_bsmt_sf"
+        min="0"
+        title="Total square feet of basement area (finished and unfinished)"
+      /><br /><br />
+
+      <label for="total_baths">Total Number of Baths:</label>
+      <input
+        type="number"
+        id="total_baths"
+        name="total_baths"
+        min="0"
+        step="0.5"
+        required
+        title="Total number of bathrooms (full bath = 1, half bath = 0.5)"
+      /><br /><br />
+
+      <label for="fireplaces">Number of Fireplaces:</label>
+      <input
+        type="number"
+        id="fireplaces"
+        name="fireplaces"
+        min="0"
+        title="Number of fireplaces in the house"
+      /><br /><br />
+
+      <label for="garage_area">Garage Square Feet:</label>
+      <input
+        type="number"
+        id="garage_area"
+        name="garage_area"
+        min="0"
+        title="Total square feet of the garage area.  If there is no garage, leave this field empty."
+      /><br /><br />
+
+      <label for="garage_cars">Number of Car Garage:</label>
+      <select
+        id="garage_cars"
+        name="garage_cars"
+        title="Number of cars the garage can hold"
+      >
+        <option value="0" selected>No Garage</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3 or more</option></select
+      ><br /><br />
+
+      <label for="garage_yr_blt">Year Garage Built (if detached):</label>
+      <input
+        type="number"
+        id="garage_yr_blt"
+        name="garage_yr_blt"
+        min="1900"
+        max="2025"
+        title="Year the garage was built (if detached)"
+      /><br /><br />
+
+      <label for="year_built">Year Built:</label>
+      <input
+        type="number"
+        id="year_built"
+        name="year_built"
+        min="1900"
+        max="2025"
+        title="Year the house was originally built"
+      /><br /><br />
+
+      <label for="year_remod_add">Last Year Remodeled or Additions:</label>
+      <input
+        type="number"
+        id="year_remod_add"
+        name="year_remod_add"
+        min="1900"
+        max="2025"
+        title="Year of last remodel or addition (leave blank if never remodeled)"
+      /><br /><br />
+
+      <button type="submit">Calculate</button>
+    </form>
+
+    {% if results and results|length > 0 %}
+    <h2>Calculation Results</h2>
+    <table
+      id="resultsTable"
+      border="1"
+      style="border-collapse: collapse; width: 100%"
+    >
+      <thead>
+        <tr>
+          <th onclick="sortTable(0)">Overall Qual</th>
+          <th onclick="sortTable(1)">Garage SF</th>
+          <th onclick="sortTable(2)">Living SF</th>
+          <th onclick="sortTable(3)">Ground Flr SF</th>
+          <th onclick="sortTable(4)">Garage Cars</th>
+          <th onclick="sortTable(5)">Total Baths</th>
+          <th onclick="sortTable(6)">Year Built</th>
+          <th onclick="sortTable(7)">Basement SF</th>
+          <th onclick="sortTable(8)">Year Remod/Add</th>
+          <th onclick="sortTable(9)">Garage Yr Built</th>
+          <th onclick="sortTable(10)">Fireplaces</th>
+          <th onclick="sortTable(11)">Suggested Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in results %}
+        <tr>
+          <td>{{ row.overall_qual }}</td>
+          <td>{{ row.garage_area }}</td>
+          <td>{{ row.gr_liv_area }}</td>
+          <td>{{ row.first_flr_sf }}</td>
+          <td>{{ row.garage_cars }}</td>
+          <td>{{ row.total_baths }}</td>
+          <td>{{ row.year_built }}</td>
+          <td>{{ row.total_bsmt_sf }}</td>
+          <td>{{ row.year_remod_add }}</td>
+          <td>{{ row.garage_yr_blt }}</td>
+          <td>{{ row.fireplaces }}</td>
+          <td>{{ row.result }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <script>
+      // Simple table sort function
+      function sortTable(n) {
+        var table,
+          rows,
+          switching,
+          i,
+          x,
+          y,
+          shouldSwitch,
+          dir,
+          switchcount = 0;
+        table = document.getElementById("resultsTable");
+        switching = true;
+        dir = "asc";
+        while (switching) {
+          switching = false;
+          rows = table.rows;
+          for (i = 1; i < rows.length - 1; i++) {
+            shouldSwitch = false;
+            x = rows[i].getElementsByTagName("TD")[n];
+            y = rows[i + 1].getElementsByTagName("TD")[n];
+            if (dir == "asc") {
+              if (
+                !isNaN(parseFloat(x.innerHTML)) &&
+                !isNaN(parseFloat(y.innerHTML))
+              ) {
+                if (parseFloat(x.innerHTML) > parseFloat(y.innerHTML)) {
+                  shouldSwitch = true;
+                  break;
+                }
+              } else if (
+                x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()
+              ) {
+                shouldSwitch = true;
+                break;
+              }
+            } else if (dir == "desc") {
+              if (
+                !isNaN(parseFloat(x.innerHTML)) &&
+                !isNaN(parseFloat(y.innerHTML))
+              ) {
+                if (parseFloat(x.innerHTML) < parseFloat(y.innerHTML)) {
+                  shouldSwitch = true;
+                  break;
+                }
+              } else if (
+                x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()
+              ) {
+                shouldSwitch = true;
+                break;
+              }
+            }
+          }
+          if (shouldSwitch) {
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+            switchcount++;
+          } else {
+            if (switchcount == 0 && dir == "asc") {
+              dir = "desc";
+              switching = true;
+            }
+          }
+        }
+      }
+    </script>
+    {% endif %}
+  </body>
+</html>
